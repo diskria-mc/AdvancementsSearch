@@ -9,8 +9,6 @@
     "AdvancementsScreenMixin",
     "AdvancementTabMixin",
     "AdvancementWidgetMixin",
-    "BookScreenMixin",
-    "ChatScreenMixin",
     "ParentElementMixin",
     "ScreenMixin"
   ]

@@ -1,18 +1,18 @@
 package com.diskree.advancementssearch.injection.mixin;
 
 import com.diskree.advancementssearch.AdvancementsSearchMod;
-import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import com.diskree.advancementssearch.HighlightType;
+import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.PlacedAdvancement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -22,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
 
 @Mixin(AdvancementWidget.class)
 public abstract class AdvancementWidgetMixin {
@@ -57,12 +55,12 @@ public abstract class AdvancementWidgetMixin {
         method = "renderWidgets",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V"
+            target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"
         )
     )
     private void highlightWidget(
         DrawContext context,
-        Function<Identifier, RenderLayer> renderLayers,
+        RenderPipeline pipeline,
         Identifier sprite,
         int x,
         int y,
@@ -80,7 +78,7 @@ public abstract class AdvancementWidgetMixin {
             ) {
                 return;
             }
-            original.call(context, renderLayers, sprite, x, y, width, height);
+            original.call(context, pipeline, sprite, x, y, width, height);
         }
     }
 

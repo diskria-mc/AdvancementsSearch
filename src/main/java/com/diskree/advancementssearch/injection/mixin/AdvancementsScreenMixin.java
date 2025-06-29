@@ -9,6 +9,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.advancement.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
@@ -16,7 +17,6 @@ import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -456,7 +456,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         method = "drawAdvancementTree",
         at = @At("TAIL")
     )
-    private void startHighlight(DrawContext context, int mouseX, int mouseY, int x, int y, CallbackInfo ci) {
+    private void startHighlight(DrawContext context, int x, int y, CallbackInfo ci) {
         if (highlightedAdvancement == null || selectedTab == null) {
             return;
         }
@@ -522,10 +522,10 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         method = "drawWindow",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)I"
+            target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIIZ)V"
         )
     )
-    private int modifyWindowTitleRender(
+    private void modifyWindowTitleRender(
         DrawContext context,
         TextRenderer textRenderer,
         Text text,
@@ -557,7 +557,6 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         } else {
             context.drawText(textRenderer, text, x, y, color, shadow);
         }
-        return 0;
     }
 
     @Redirect(
@@ -660,23 +659,21 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         method = "render",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawAdvancementTree(Lnet/minecraft/client/gui/DrawContext;IIII)V"
+            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawAdvancementTree(Lnet/minecraft/client/gui/DrawContext;II)V"
         )
     )
     public void getWindowSizes(
         AdvancementsScreen screen,
         DrawContext context,
-        int mouseX,
-        int mouseY,
         int x,
         int y,
-        @NotNull Operation<Void> original
+        Operation<Void> original
     ) {
         windowX = x;
         windowY = y;
         treeWidth = Math.abs(windowX * 2 - width) - WINDOW_BORDER_SIZE - WINDOW_BORDER_SIZE;
         treeHeight = Math.abs(windowY * 2 - height) - WINDOW_HEADER_HEIGHT - WINDOW_BORDER_SIZE;
-        original.call(screen, context, mouseX, mouseY, x, y);
+        original.call(screen, context, x, y);
     }
 
     @Inject(
@@ -714,7 +711,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             int fieldY = windowY + 4;
 
             context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 CREATIVE_INVENTORY_TEXTURE,
                 fieldX,
                 fieldY,
