@@ -25,21 +25,21 @@ public class AdvancementTabMixin {
     private AdvancementsScreen screen;
 
     @Inject(
-        method = "drawWidgetTooltip",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementWidget;drawTooltip(Lnet/minecraft/client/gui/DrawContext;IIFII)V",
-            shift = At.Shift.AFTER
-        )
+            method = "drawWidgetTooltip",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementWidget;drawTooltip(Lnet/minecraft/client/gui/DrawContext;IIFII)V",
+                    shift = At.Shift.AFTER
+            )
     )
     public void saveFocusedAdvancementWidget(
-        DrawContext context,
-        int mouseX,
-        int mouseY,
-        int x,
-        int y,
-        CallbackInfo ci,
-        @Local(ordinal = 0) AdvancementWidget advancementWidget
+            DrawContext context,
+            int mouseX,
+            int mouseY,
+            int x,
+            int y,
+            CallbackInfo ci,
+            @Local(ordinal = 0) AdvancementWidget advancementWidget
     ) {
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
             advancementsScreenExtension.advancementssearch$setFocusedAdvancementWidget(advancementWidget);
@@ -47,21 +47,21 @@ public class AdvancementTabMixin {
     }
 
     @Inject(
-        method = "drawWidgetTooltip",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F",
-            ordinal = 1,
-            shift = At.Shift.BEFORE
-        )
+            method = "drawWidgetTooltip",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F",
+                    ordinal = 1,
+                    shift = At.Shift.BEFORE
+            )
     )
     public void resetFocusedAdvancementWidget(
-        DrawContext context,
-        int mouseX,
-        int mouseY,
-        int x,
-        int y,
-        CallbackInfo ci
+            DrawContext context,
+            int mouseX,
+            int mouseY,
+            int x,
+            int y,
+            CallbackInfo ci
     ) {
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
             advancementsScreenExtension.advancementssearch$setFocusedAdvancementWidget(null);
@@ -69,28 +69,28 @@ public class AdvancementTabMixin {
     }
 
     @WrapOperation(
-        method = "render",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"
-        )
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"
+            )
     )
     private void cancelBackgroundRenderInSearch(
-        DrawContext context,
-        RenderPipeline pipeline,
-        Identifier sprite,
-        int x,
-        int y,
-        float u,
-        float v,
-        int width,
-        int height,
-        int textureWidth,
-        int textureHeight,
-        Operation<Void> original
+            DrawContext context,
+            RenderPipeline pipeline,
+            Identifier sprite,
+            int x,
+            int y,
+            float u,
+            float v,
+            int width,
+            int height,
+            int textureWidth,
+            int textureHeight,
+            Operation<Void> original
     ) {
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension &&
-            !advancementsScreenExtension.advancementssearch$isSearchActive()
+                !advancementsScreenExtension.advancementssearch$isSearchActive()
         ) {
             original.call(context, pipeline, sprite, x, y, u, v, width, height, textureWidth, textureHeight);
         }

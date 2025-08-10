@@ -27,53 +27,48 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 public class AdvancementsSearchMod implements ClientModInitializer {
 
     public static final Identifier ADVANCEMENTS_SEARCH_ID =
-        Identifier.of(BuildConfig.MOD_ID, BuildConfig.MOD_ID + "/root");
+            Identifier.of(BuildConfig.MOD_ID, BuildConfig.MOD_ID + "/root");
 
     public static boolean isSearch(PlacedAdvancement root) {
         return root != null && ADVANCEMENTS_SEARCH_ID.equals(root.getAdvancementEntry().id());
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isModCommand(@NotNull String command) {
-        return command.startsWith("/" + BuildConfig.MOD_ID + " ");
-    }
-
     @Override
     public void onInitializeClient() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-            dispatcher.register(literal(BuildConfig.MOD_ID)
-                .then(literal("search")
-                    .then(argument("query", StringArgumentType.string())
-                        .then(argument("by", StringArgumentType.word())
-                            .suggests(new SearchByTypeSuggestionProvider())
-                            .then(argument("autoHighlightSingle", BoolArgumentType.bool())
-                                .then(argument("highlightType", StringArgumentType.word())
-                                    .suggests(new HighlightTypeSuggestionProvider())
-                                    .executes(context -> search(
-                                        context.getSource().getClient(),
-                                        StringArgumentType.getString(context, "query"),
-                                        SearchByType.map(StringArgumentType.getString(context, "by")),
-                                        BoolArgumentType.getBool(context, "autoHighlightSingle"),
-                                        HighlightType.map(StringArgumentType.getString(context, "highlightType")))
-                                    )
+                dispatcher.register(literal(BuildConfig.MOD_ID)
+                        .then(literal("search")
+                                .then(argument("query", StringArgumentType.string())
+                                        .then(argument("by", StringArgumentType.word())
+                                                .suggests(new SearchByTypeSuggestionProvider())
+                                                .then(argument("autoHighlightSingle", BoolArgumentType.bool())
+                                                        .then(argument("highlightType", StringArgumentType.word())
+                                                                .suggests(new HighlightTypeSuggestionProvider())
+                                                                .executes(context -> search(
+                                                                        context.getSource().getClient(),
+                                                                        StringArgumentType.getString(context, "query"),
+                                                                        SearchByType.map(StringArgumentType.getString(context, "by")),
+                                                                        BoolArgumentType.getBool(context, "autoHighlightSingle"),
+                                                                        HighlightType.map(StringArgumentType.getString(context, "highlightType")))
+                                                                )
+                                                        )
+                                                )
+                                        )
                                 )
-                            )
                         )
-                    )
-                )
-                .then(literal("highlight")
-                    .then(argument("advancementId", IdentifierArgumentType.identifier())
-                        .then(argument("highlightType", StringArgumentType.word())
-                            .suggests(new HighlightTypeSuggestionProvider())
-                            .executes(context -> highlight(
-                                context.getSource().getClient(),
-                                context.getArgument("advancementId", Identifier.class),
-                                HighlightType.map(StringArgumentType.getString(context, "highlightType")))
-                            )
+                        .then(literal("highlight")
+                                .then(argument("advancementId", IdentifierArgumentType.identifier())
+                                        .then(argument("highlightType", StringArgumentType.word())
+                                                .suggests(new HighlightTypeSuggestionProvider())
+                                                .executes(context -> highlight(
+                                                        context.getSource().getClient(),
+                                                        context.getArgument("advancementId", Identifier.class),
+                                                        HighlightType.map(StringArgumentType.getString(context, "highlightType")))
+                                                )
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         );
     }
 
@@ -81,8 +76,8 @@ public class AdvancementsSearchMod implements ClientModInitializer {
 
         @Override
         public CompletableFuture<Suggestions> getSuggestions(
-            CommandContext<FabricClientCommandSource> context,
-            SuggestionsBuilder builder
+                CommandContext<FabricClientCommandSource> context,
+                SuggestionsBuilder builder
         ) {
             for (SearchByType type : SearchByType.values()) {
                 builder.suggest(type.name().toLowerCase(Locale.ROOT));
@@ -95,8 +90,8 @@ public class AdvancementsSearchMod implements ClientModInitializer {
 
         @Override
         public CompletableFuture<Suggestions> getSuggestions(
-            CommandContext<FabricClientCommandSource> context,
-            SuggestionsBuilder builder
+                CommandContext<FabricClientCommandSource> context,
+                SuggestionsBuilder builder
         ) {
             for (HighlightType type : HighlightType.values()) {
                 builder.suggest(type.name().toLowerCase(Locale.ROOT));
@@ -106,21 +101,21 @@ public class AdvancementsSearchMod implements ClientModInitializer {
     }
 
     private int search(
-        @NotNull MinecraftClient client,
-        String query,
-        SearchByType searchByType,
-        boolean autoHighlightSingle,
-        HighlightType highlightType
+            @NotNull MinecraftClient client,
+            String query,
+            SearchByType searchByType,
+            boolean autoHighlightSingle,
+            HighlightType highlightType
     ) {
         if (client.player != null) {
             AdvancementsScreen screen = new AdvancementsScreen(client.player.networkHandler.getAdvancementHandler());
             client.setScreen(screen);
             if (client.currentScreen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
                 advancementsScreenExtension.advancementssearch$search(
-                    query,
-                    searchByType,
-                    autoHighlightSingle,
-                    highlightType
+                        query,
+                        searchByType,
+                        autoHighlightSingle,
+                        highlightType
                 );
             }
         }
@@ -128,9 +123,9 @@ public class AdvancementsSearchMod implements ClientModInitializer {
     }
 
     private int highlight(
-        @NotNull MinecraftClient client,
-        Identifier advancementId,
-        HighlightType highlightType
+            @NotNull MinecraftClient client,
+            Identifier advancementId,
+            HighlightType highlightType
     ) {
         if (client.player != null) {
             AdvancementsScreen screen = new AdvancementsScreen(client.player.networkHandler.getAdvancementHandler());

@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ScreenMixin {
 
     @Inject(
-        method = "tick",
-        at = @At(value = "HEAD")
+            method = "tick",
+            at = @At(value = "HEAD")
     )
     private void tickInAdvancementsScreen(CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
@@ -23,8 +23,8 @@ public class ScreenMixin {
     }
 
     @Inject(
-        method = "resize",
-        at = @At(value = "HEAD")
+            method = "resize",
+            at = @At(value = "HEAD")
     )
     private void resizeInAdvancementsScreen(MinecraftClient client, int width, int height, CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;

@@ -24,10 +24,10 @@ public interface AdvancementsScreenExtension {
     void advancementssearch$stopHighlight();
 
     void advancementssearch$search(
-        String query,
-        SearchByType searchByType,
-        boolean autoHighlightSingle,
-        HighlightType highlightType
+            String query,
+            SearchByType searchByType,
+            boolean autoHighlightSingle,
+            HighlightType highlightType
     );
 
     void advancementssearch$highlightAdvancement(Identifier advancementId, HighlightType highlightType);

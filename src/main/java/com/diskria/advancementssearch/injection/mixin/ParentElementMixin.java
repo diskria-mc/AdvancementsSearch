@@ -11,14 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public interface ParentElementMixin {
 
     @Inject(
-        method = "mouseReleased",
-        at = @At(value = "HEAD")
+            method = "mouseReleased",
+            at = @At(value = "HEAD")
     )
     private void onMouseReleasedInAdvancementsScreen(
-        double mouseX,
-        double mouseY,
-        int button,
-        CallbackInfoReturnable<Boolean> cir
+            double mouseX,
+            double mouseY,
+            int button,
+            CallbackInfoReturnable<Boolean> cir
     ) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension) {
             advancementsScreenExtension.advancementssearch$onMouseReleased(mouseX, mouseY, button);
@@ -26,13 +26,13 @@ public interface ParentElementMixin {
     }
 
     @Inject(
-        method = "charTyped",
-        at = @At(value = "HEAD"),
-        cancellable = true
+            method = "charTyped",
+            at = @At(value = "HEAD"),
+            cancellable = true
     )
     private void onCharTypedInAdvancementsScreen(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension &&
-            advancementsScreenExtension.advancementssearch$charTyped(chr, modifiers)
+                advancementsScreenExtension.advancementssearch$charTyped(chr, modifiers)
         ) {
             cir.setReturnValue(true);
         }
