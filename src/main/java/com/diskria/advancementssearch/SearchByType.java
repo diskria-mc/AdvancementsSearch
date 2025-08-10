@@ -1,4 +1,4 @@
-package com.diskree.advancementssearch;
+package com.diskria.advancementssearch;
 
 import java.util.Locale;
 

@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "com.diskree.advancementssearch.injection.mixin",
+  "package": "com.diskria.advancementssearch.injection.mixin",
   "compatibilityLevel": "JAVA_21",
   "injectors": {
     "defaultRequire": 1
@@ -9,6 +9,7 @@
     "AdvancementsScreenMixin",
     "AdvancementTabMixin",
     "AdvancementWidgetMixin",
+    "ChatScreenMixin",
     "ParentElementMixin",
     "ScreenMixin"
   ]

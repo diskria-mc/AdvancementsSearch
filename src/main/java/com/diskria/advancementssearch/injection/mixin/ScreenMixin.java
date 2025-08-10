@@ -1,6 +1,6 @@
-package com.diskree.advancementssearch.injection.mixin;
+package com.diskria.advancementssearch.injection.mixin;
 
-import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,6 +1,6 @@
-package com.diskree.advancementssearch.injection.mixin;
+package com.diskria.advancementssearch.injection.mixin;
 
-import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

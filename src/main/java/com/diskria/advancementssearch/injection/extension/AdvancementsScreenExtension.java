@@ -1,7 +1,7 @@
-package com.diskree.advancementssearch.injection.extension;
+package com.diskria.advancementssearch.injection.extension;
 
-import com.diskree.advancementssearch.HighlightType;
-import com.diskree.advancementssearch.SearchByType;
+import com.diskria.advancementssearch.HighlightType;
+import com.diskria.advancementssearch.SearchByType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.util.Identifier;

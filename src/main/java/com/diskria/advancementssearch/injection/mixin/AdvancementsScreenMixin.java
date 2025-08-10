@@ -1,9 +1,9 @@
-package com.diskree.advancementssearch.injection.mixin;
+package com.diskria.advancementssearch.injection.mixin;
 
-import com.diskree.advancementssearch.AdvancementsSearchMod;
-import com.diskree.advancementssearch.HighlightType;
-import com.diskree.advancementssearch.SearchByType;
-import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import com.diskria.advancementssearch.AdvancementsSearchMod;
+import com.diskria.advancementssearch.HighlightType;
+import com.diskria.advancementssearch.SearchByType;
+import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.advancement.*;

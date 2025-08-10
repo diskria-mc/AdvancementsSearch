@@ -1,6 +1,6 @@
-package com.diskree.advancementssearch;
+package com.diskria.advancementssearch;
 
-import com.diskree.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
