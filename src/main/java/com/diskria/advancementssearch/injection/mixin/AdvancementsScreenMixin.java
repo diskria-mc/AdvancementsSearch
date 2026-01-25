@@ -10,12 +10,15 @@ import net.minecraft.advancement.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -222,10 +225,10 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public boolean advancementssearch$charTyped(char chr, int modifiers) {
+    public boolean advancementssearch$charTyped(CharInput input) {
         if (searchField != null) {
             String oldText = searchField.getText();
-            if (searchField.charTyped(chr, modifiers)) {
+            if (searchField.charTyped(input)) {
                 if (!Objects.equals(oldText, searchField.getText())) {
                     searchByUser();
                 }
@@ -245,11 +248,11 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public void advancementssearch$onMouseReleased(double mouseX, double mouseY, int button) {
+    public void advancementssearch$onMouseReleased(Click click) {
         if (isFocusedAdvancementClicked &&
                 focusedAdvancementWidget != null &&
                 focusedAdvancementWidget.tab == searchTab &&
-                button == GLFW.GLFW_MOUSE_BUTTON_LEFT
+                click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT
         ) {
             Identifier focusedAdvancementId = focusedAdvancementWidget.advancement.getAdvancementEntry().id();
             for (PlacedAdvancement advancement : getAdvancements(true)) {
@@ -734,16 +737,16 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    public void keyPressedInject(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    public void keyPressedInject(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         if (searchField != null) {
             String oldText = searchField.getText();
-            if (searchField.keyPressed(keyCode, scanCode, modifiers)) {
+            if (searchField.keyPressed(input)) {
                 if (!Objects.equals(oldText, searchField.getText())) {
                     searchByUser();
                 }
                 cir.setReturnValue(true);
             }
-            if (keyCode != GLFW.GLFW_KEY_ESCAPE) {
+            if (input.key() != GLFW.GLFW_KEY_ESCAPE) {
                 cir.setReturnValue(true);
             }
         }
@@ -754,14 +757,14 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    public void mouseClickedInject(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (searchField != null && searchField.mouseClicked(mouseX, mouseY, button)) {
+    public void mouseClickedInject(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        if (searchField != null && searchField.mouseClicked(click, doubled)) {
             isSearchActive = !searchField.getText().isEmpty();
             cir.setReturnValue(true);
         }
         isFocusedAdvancementClicked = focusedAdvancementWidget != null &&
                 focusedAdvancementWidget.tab == searchTab &&
-                button == MouseEvent.NOBUTTON;
+            click.button() == MouseEvent.NOBUTTON;
     }
 
     @Inject(
@@ -783,12 +786,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             at = @At(value = "HEAD")
     )
     private void resetFocusedAdvancementOnDrag(
-            double mouseX,
-            double mouseY,
-            int button,
-            double deltaX,
-            double deltaY,
-            CallbackInfoReturnable<Boolean> cir
+        Click click, double offsetX, double offsetY, CallbackInfoReturnable<Boolean> cir
     ) {
         isFocusedAdvancementClicked = false;
     }

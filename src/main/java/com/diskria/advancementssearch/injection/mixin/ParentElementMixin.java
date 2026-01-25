@@ -1,7 +1,9 @@
 package com.diskria.advancementssearch.injection.mixin;
 
 import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.input.CharInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,13 +17,10 @@ public interface ParentElementMixin {
             at = @At(value = "HEAD")
     )
     private void onMouseReleasedInAdvancementsScreen(
-            double mouseX,
-            double mouseY,
-            int button,
-            CallbackInfoReturnable<Boolean> cir
+        Click click, CallbackInfoReturnable<Boolean> cir
     ) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension) {
-            advancementsScreenExtension.advancementssearch$onMouseReleased(mouseX, mouseY, button);
+            advancementsScreenExtension.advancementssearch$onMouseReleased(click);
         }
     }
 
@@ -30,9 +29,9 @@ public interface ParentElementMixin {
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    private void onCharTypedInAdvancementsScreen(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void onCharTypedInAdvancementsScreen(CharInput input, CallbackInfoReturnable<Boolean> cir) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension &&
-                advancementsScreenExtension.advancementssearch$charTyped(chr, modifiers)
+                advancementsScreenExtension.advancementssearch$charTyped(input)
         ) {
             cir.setReturnValue(true);
         }
