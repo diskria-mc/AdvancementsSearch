@@ -2,7 +2,6 @@ package com.diskria.advancementssearch.injection.extension;
 
 import com.diskria.advancementssearch.HighlightType;
 import com.diskria.advancementssearch.SearchByType;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.input.CharInput;
@@ -38,7 +37,7 @@ public interface AdvancementsScreenExtension {
 
     boolean advancementssearch$charTyped(CharInput input);
 
-    void advancementssearch$resize(MinecraftClient client, int width, int height);
+    void advancementssearch$resize(int width, int height);
 
     void advancementssearch$onMouseReleased(Click click);
 }

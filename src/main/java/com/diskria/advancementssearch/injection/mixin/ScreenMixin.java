@@ -1,7 +1,6 @@
 package com.diskria.advancementssearch.injection.mixin;
 
 import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,10 +25,10 @@ public class ScreenMixin {
             method = "resize",
             at = @At(value = "HEAD")
     )
-    private void resizeInAdvancementsScreen(MinecraftClient client, int width, int height, CallbackInfo ci) {
+    private void resizeInAdvancementsScreen(int width, int height, CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
-            advancementsScreenExtension.advancementssearch$resize(client, width, height);
+            advancementsScreenExtension.advancementssearch$resize(width, height);
         }
     }
 }

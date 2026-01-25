@@ -7,7 +7,6 @@ import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExte
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.advancement.*;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
@@ -239,10 +238,10 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public void advancementssearch$resize(MinecraftClient client, int width, int height) {
+    public void advancementssearch$resize(int width, int height) {
         if (searchField != null) {
             String oldText = searchField.getText();
-            init(client, width, height);
+            init(width, height);
             searchField.setText(oldText);
         }
     }
@@ -512,12 +511,12 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             method = "drawWindow",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementTab;drawBackground(Lnet/minecraft/client/gui/DrawContext;IIZ)V"
+                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementTab;drawBackground(Lnet/minecraft/client/gui/DrawContext;IIIIZ)V"
             )
     )
     private void drawWindowModifyTabSelected(Args args) {
         if (isSearchActive) {
-            args.set(3, false);
+            args.set(5, false);
         }
     }
 
@@ -683,7 +682,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             method = "render",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V",
+                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;IIII)V",
                     shift = At.Shift.AFTER
             )
     )
