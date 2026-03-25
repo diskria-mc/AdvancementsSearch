@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loomVersion}-SNAPSHOT"
+    id 'net.fabricmc.fabric-loom' version "${loomVersion}-SNAPSHOT"
 }
 
 def modId = project.modName.toLowerCase()
@@ -18,9 +18,7 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minMinecraftVersion}"
-    mappings "net.fabricmc:yarn:${minMinecraftVersion}+build.${mappingsBuild}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${minLoaderVersion}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${apiVersion}+${minMinecraftVersion}"
+    implementation "net.fabricmc:fabric-loader:${minLoaderVersion}"
 }
 
 processResources {

@@ -11,15 +11,6 @@ public enum SearchByType {
 
     private static final String QUERY_SEPARATOR = ":";
 
-    public static SearchByType map(String suggestion) {
-        for (SearchByType searchByType : SearchByType.values()) {
-            if (searchByType.name().equalsIgnoreCase(suggestion)) {
-                return searchByType;
-            }
-        }
-        return EVERYWHERE;
-    }
-
     public static SearchByType findByMask(String query) {
         for (SearchByType searchByType : SearchByType.values()) {
             if (searchByType != EVERYWHERE) {

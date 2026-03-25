@@ -2,10 +2,10 @@ package com.diskria.advancementssearch.injection.extension;
 
 import com.diskria.advancementssearch.HighlightType;
 import com.diskria.advancementssearch.SearchByType;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
-import net.minecraft.client.input.CharInput;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.resources.Identifier;
 
 public interface AdvancementsScreenExtension {
     void advancementssearch$setFocusedAdvancementWidget(AdvancementWidget focusedAdvancementWidget);
@@ -35,9 +35,9 @@ public interface AdvancementsScreenExtension {
 
     void advancementssearch$tick();
 
-    boolean advancementssearch$charTyped(CharInput input);
+    boolean advancementssearch$charTyped(CharacterEvent characterEvent);
 
     void advancementssearch$resize(int width, int height);
 
-    void advancementssearch$onMouseReleased(Click click);
+    void advancementssearch$onMouseReleased(MouseButtonEvent mouseButtonEvent);
 }
