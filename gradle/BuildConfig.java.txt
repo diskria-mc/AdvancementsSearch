@@ -1,4 +1,4 @@
-package com.${author}.${modId};
+package io.github.${author}.${modId};
 
 public class BuildConfig {
     public static final String MOD_NAME = "${modName}";

@@ -11,20 +11,20 @@
 		"sources": "${repoUrl}"
 	},
 	"license": "MIT",
-	"icon": "assets/advancementssearch/icon.png",
+	"icon": "assets/advancements_search/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-          "com.diskria.advancementssearch.AdvancementsSearchMod"
+          "io.github.diskria.advancements_search.AdvancementsSearchMod"
 		]
 	},
 	"mixins": [
-		"advancementssearch.mixins.json"
+		"advancements_search.mixins.json"
 	],
 	"depends": {
 		"java": ">=${minJavaVersion}",
 		"minecraft": ">=${minMinecraftVersion}",
 		"fabricloader": ">=${minLoaderVersion}"
 	},
-	"accessWidener": "advancementssearch.accesswidener"
+	"accessWidener": "advancements_search.accesswidener"
 }

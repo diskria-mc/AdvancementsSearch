@@ -1,12 +1,12 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loomVersion}-SNAPSHOT"
+    id 'net.fabricmc.fabric-loom' version "${loomVersion}"
 }
 
-def modId = project.modName.toLowerCase()
-def repoUrl = "https://github.com/${author}/${modName}"
+def modId = project.modId
+def repoUrl = "https://github.com/${author}/${modId.replace('_', '-')}"
 
 version = "mc${minMinecraftVersion}+${modVersion}"
-group = "com." + project.author
+group = "io.github." + project.author
 
 base {
     archivesName = modId
@@ -53,7 +53,7 @@ tasks.withType(JavaCompile).configureEach {
 tasks.register('generateBuildConfig', DefaultTask) {
     doLast {
         def templateFile = file("$projectDir/gradle/BuildConfig.java.txt")
-        def configFile = file("$projectDir/src/main/generated/java/com/${author}/${modId}/BuildConfig.java")
+        def configFile = file("$projectDir/src/main/generated/java/io/github/${author}/${modId}/BuildConfig.java")
         configFile.getParentFile().mkdirs()
 
         configFile.text = templateFile.text

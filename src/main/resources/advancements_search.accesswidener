@@ -11,6 +11,8 @@ accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab mi
 accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab maxX I
 accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab maxY I
 accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab centered Z
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab fade F
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab hovered Lnet/minecraft/client/gui/screens/advancements/AdvancementWidget;
 accessible method net/minecraft/client/gui/screens/advancements/AdvancementTab addWidget (Lnet/minecraft/client/gui/screens/advancements/AdvancementWidget;Lnet/minecraft/advancements/AdvancementHolder;)V
 
 accessible field net/minecraft/client/gui/screens/advancements/AdvancementWidget tab Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;

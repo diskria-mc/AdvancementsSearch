@@ -1,4 +1,4 @@
-package com.diskria.advancementssearch;
+package io.github.diskria.advancements_search;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.advancements.AdvancementNode;

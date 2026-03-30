@@ -1,6 +1,6 @@
-package com.diskria.advancementssearch.injection.mixin;
+package io.github.diskria.advancements_search.injection.mixin;
 
-import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import io.github.diskria.advancements_search.injection.extension.AdvancementsScreenExtension;
 import net.minecraft.client.gui.screens.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +17,7 @@ public class ScreenMixin {
     private void tickInAdvancementsScreen(CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
-            advancementsScreenExtension.advancementssearch$tick();
+            advancementsScreenExtension.advancements_search$tick();
         }
     }
 
@@ -28,7 +28,7 @@ public class ScreenMixin {
     private void resizeInAdvancementsScreen(int width, int height, CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
         if (screen instanceof AdvancementsScreenExtension advancementsScreenExtension) {
-            advancementsScreenExtension.advancementssearch$resize(width, height);
+            advancementsScreenExtension.advancements_search$resize(width, height);
         }
     }
 }

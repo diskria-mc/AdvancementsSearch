@@ -1,6 +1,6 @@
-package com.diskria.advancementssearch.injection.mixin;
+package io.github.diskria.advancements_search.injection.mixin;
 
-import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import io.github.diskria.advancements_search.injection.extension.AdvancementsScreenExtension;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -20,7 +20,7 @@ public interface ContainerEventHandlerMixin {
         MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir
     ) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension) {
-            advancementsScreenExtension.advancementssearch$onMouseReleased(event);
+            advancementsScreenExtension.advancements_search$onMouseReleased(event);
         }
     }
 
@@ -31,7 +31,7 @@ public interface ContainerEventHandlerMixin {
     )
     private void onCharTypedInAdvancementsScreen(CharacterEvent event, CallbackInfoReturnable<Boolean> cir) {
         if (this instanceof AdvancementsScreenExtension advancementsScreenExtension &&
-                advancementsScreenExtension.advancementssearch$charTyped(event)
+                advancementsScreenExtension.advancements_search$charTyped(event)
         ) {
             cir.setReturnValue(true);
         }

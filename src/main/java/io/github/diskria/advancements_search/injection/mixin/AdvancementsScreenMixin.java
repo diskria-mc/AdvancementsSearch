@@ -1,9 +1,8 @@
-package com.diskria.advancementssearch.injection.mixin;
+package io.github.diskria.advancements_search.injection.mixin;
 
-import com.diskria.advancementssearch.AdvancementsSearchMod;
-import com.diskria.advancementssearch.HighlightType;
-import com.diskria.advancementssearch.SearchByType;
-import com.diskria.advancementssearch.injection.extension.AdvancementsScreenExtension;
+import io.github.diskria.advancements_search.AdvancementsSearchMod;
+import io.github.diskria.advancements_search.injection.extension.AdvancementsScreenExtension;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -38,11 +37,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -81,13 +77,20 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     private static final int TREE_X_OFFSET = 3;
 
     @Unique
-    private static final int WIDGET_HIGHLIGHT_COUNT = 5;
+    private static final int FLASHING_COUNT = 5;
 
     @Unique
-    private static final int WIDGET_HIGHLIGHT_TICKS = 3;
+    private static final int FLASHING_TICKS_INTERVAL = 3;
 
     @Unique
     private static final int SEARCH_FIELD_TEXT_LEFT_OFFSET = 2;
+
+    @Unique
+    private static final List<AdvancementType> TYPE_PRIORITY = Arrays.asList(
+        AdvancementType.TASK,
+        AdvancementType.GOAL,
+        AdvancementType.CHALLENGE
+    );
 
     @Unique
     private EditBox searchBox;
@@ -114,28 +117,16 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     private AdvancementWidget focusedAdvancementWidget;
 
     @Unique
-    private int windowX;
-
-    @Unique
-    private int windowY;
-
-    @Unique
     private int treeWidth;
 
     @Unique
     private int treeHeight;
 
     @Unique
-    private AdvancementNode highlightedAdvancement;
+    private Identifier flashingAdvancementId;
 
     @Unique
-    private Identifier highlightedAdvancementId;
-
-    @Unique
-    private HighlightType highlightType;
-
-    @Unique
-    private int widgetHighlightCounter;
+    private int flashingTickCounter;
 
     @Unique
     private boolean isFocusedAdvancementClicked;
@@ -145,93 +136,58 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public void advancementssearch$setFocusedAdvancementWidget(AdvancementWidget focusedAdvancementWidget) {
-        this.focusedAdvancementWidget = focusedAdvancementWidget;
+    public void advancements_search$setFocusedAdvancementWidget(AdvancementWidget widget) {
+        focusedAdvancementWidget = widget;
     }
 
     @Override
-    public boolean advancementssearch$isSearchActive() {
+    public boolean advancements_search$isSearchActive() {
         return isSearchActive;
     }
 
     @Override
-    public int advancementssearch$getTreeWidth() {
+    public int advancements_search$getTreeWidth() {
         return treeWidth;
     }
 
     @Override
-    public int advancementssearch$getTreeHeight() {
+    public int advancements_search$getTreeHeight() {
         return treeHeight;
     }
 
     @Override
-    public Identifier advancementssearch$getHighlightedAdvancementId() {
-        return highlightedAdvancementId;
+    public Identifier advancements_search$getFlashingAdvancementId() {
+        return flashingAdvancementId;
     }
 
     @Override
-    public HighlightType advancementssearch$getHighlightType() {
-        return highlightType;
+    public boolean advancements_search$isFlashingAtInvisibleState() {
+        return flashingTickCounter != 0 && (flashingTickCounter / FLASHING_TICKS_INTERVAL) % 2 == 0;
     }
 
     @Override
-    public boolean advancementssearch$isHighlightAtInvisibleState() {
-        return widgetHighlightCounter != 0 && (widgetHighlightCounter / WIDGET_HIGHLIGHT_TICKS) % 2 == 0;
+    public void advancements_search$stopFlashing() {
+        flashingAdvancementId = null;
+        flashingTickCounter = 0;
     }
 
     @Override
-    public void advancementssearch$stopHighlight() {
-        highlightedAdvancementId = null;
-        highlightType = null;
-        widgetHighlightCounter = 0;
-    }
-
-    @Override
-    public void advancementssearch$search(
-        String query,
-        SearchByType searchByType,
-        boolean autoHighlightSingle,
-        HighlightType highlightType
-    ) {
-        searchInternal(query, searchByType);
-        if (autoHighlightSingle && searchResults.size() == 1) {
-            highlight(searchResults.getFirst(), highlightType);
-            searchResults.clear();
-            return;
-        }
-        query = SearchByType.addMaskToQuery(query, searchByType);
-        searchBox.setValue(query);
-        isSearchActive = !query.isEmpty();
-        showSearchResults();
-    }
-
-    @Override
-    public void advancementssearch$highlightAdvancement(Identifier advancementId, HighlightType highlightType) {
-        for (AdvancementNode advancement : getAdvancements(false)) {
-            if (advancementId.equals(advancement.holder().id())) {
-                highlight(advancement, highlightType);
-                break;
+    public void advancements_search$tick() {
+        if (flashingTickCounter > 0) {
+            flashingTickCounter--;
+            if (flashingTickCounter == 0) {
+                advancements_search$stopFlashing();
             }
         }
     }
 
     @Override
-    public void advancementssearch$tick() {
-        if (widgetHighlightCounter > 0) {
-            widgetHighlightCounter--;
-            if (widgetHighlightCounter == 0) {
-                advancementssearch$stopHighlight();
-            }
-        }
-    }
-
-    @Override
-    public boolean advancementssearch$charTyped(CharacterEvent characterEvent) {
+    public boolean advancements_search$charTyped(CharacterEvent characterEvent) {
         if (searchBox != null) {
             String oldText = searchBox.getValue();
             if (searchBox.charTyped(characterEvent)) {
                 if (!Objects.equals(oldText, searchBox.getValue())) {
-                    searchByUser();
+                    processSearch();
                 }
                 return true;
             }
@@ -240,7 +196,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public void advancementssearch$resize(int width, int height) {
+    public void advancements_search$resize(int width, int height) {
         if (searchBox != null) {
             String oldText = searchBox.getValue();
             init(width, height);
@@ -249,16 +205,20 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Override
-    public void advancementssearch$onMouseReleased(MouseButtonEvent mouseButtonEvent) {
+    public void advancements_search$onMouseReleased(MouseButtonEvent mouseButtonEvent) {
         if (isFocusedAdvancementClicked &&
             focusedAdvancementWidget != null &&
             focusedAdvancementWidget.tab == searchTab &&
             mouseButtonEvent.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT
         ) {
             Identifier focusedAdvancementId = focusedAdvancementWidget.advancementNode.holder().id();
-            for (AdvancementNode advancement : getAdvancements(true)) {
+            for (AdvancementNode advancement : searchResults) {
                 if (advancement.holder().id().equals(focusedAdvancementId)) {
-                    highlight(advancement, HighlightType.OBTAINED_STATUS);
+                    isSearchActive = false;
+                    searchTab.hovered = null;
+                    searchTab.fade = 0.0f;
+                    flashingAdvancementId = advancement.holder().id();
+                    advancements.setSelectedTab(advancement.root().holder(), true);
                     break;
                 }
             }
@@ -266,16 +226,11 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     }
 
     @Unique
-    private @NotNull ArrayList<AdvancementNode> getAdvancements(boolean shouldExcludeRoots) {
-        ArrayList<AdvancementNode> advancements = new ArrayList<>();
-        AdvancementTree advancementManager = this.advancements.getTree();
-        Map<AdvancementHolder, AdvancementProgress> progresses = this.advancements.progress;
-        for (AdvancementHolder advancementEntry : new ArrayList<>(progresses.keySet())) {
-            if (advancementEntry == null) {
-                continue;
-            }
+    private @NotNull ArrayList<AdvancementNode> getAdvancements() {
+        ArrayList<AdvancementNode> results = new ArrayList<>();
+        for (AdvancementHolder advancementEntry : new ArrayList<>(advancements.progress.keySet())) {
             Advancement advancement = advancementEntry.value();
-            if (shouldExcludeRoots && advancement.isRoot()) {
+            if (advancement.isRoot()) {
                 continue;
             }
             DisplayInfo display = advancementEntry.value().display().orElse(null);
@@ -283,40 +238,32 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
                 continue;
             }
             if (display.isHidden()) {
-                AdvancementProgress progress = progresses.get(advancementEntry);
+                AdvancementProgress progress = advancements.progress.get(advancementEntry);
                 if (progress == null || !progress.isDone()) {
                     continue;
                 }
             }
-            AdvancementNode advancementNode = advancementManager.get(advancementEntry);
+            AdvancementNode advancementNode = advancements.getTree().get(advancementEntry);
             if (advancementNode == null) {
                 continue;
             }
-            advancements.add(advancementNode);
+            results.add(advancementNode);
         }
-        return advancements;
+        return results;
     }
 
     @Unique
-    private void searchByUser() {
+    private void processSearch() {
         if (searchBox == null) {
             return;
         }
-        String query = searchBox.getValue();
+        String query = searchBox.getValue().toLowerCase(Locale.ROOT);
         isSearchActive = !query.isEmpty();
-        searchInternal(SearchByType.getQueryWithoutMask(query), SearchByType.findByMask(query));
-        showSearchResults();
-    }
-
-    @Unique
-    private void searchInternal(String query, SearchByType searchByType) {
-        query = query.toLowerCase(Locale.ROOT);
         searchResults.clear();
         if (query.trim().isEmpty()) {
             return;
         }
-        boolean checkEverywhere = searchByType == SearchByType.EVERYWHERE;
-        for (AdvancementNode advancementNode : getAdvancements(true)) {
+        for (AdvancementNode advancementNode : getAdvancements()) {
             DisplayInfo display = advancementNode.advancement().display().orElse(null);
             if (display == null) {
                 continue;
@@ -325,30 +272,23 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             String description = display.getDescription().getString().toLowerCase(Locale.ROOT);
             String iconName = display.getIcon().item().getRegisteredName().toLowerCase(Locale.ROOT);
 
-            if ((checkEverywhere || searchByType == SearchByType.TITLE) && title.contains(query) ||
-                (checkEverywhere || searchByType == SearchByType.DESCRIPTION) && description.contains(query) ||
-                (checkEverywhere || searchByType == SearchByType.ICON) && iconName.contains(query)
-            ) {
+            if (title.contains(query) || description.contains(query) || iconName.contains(query)) {
                 searchResults.add(advancementNode);
             }
         }
         searchResults.sort(Comparator.comparing((advancement) -> advancement.holder().id()));
 
-        List<AdvancementType> frameOrder = Arrays.asList(
-            AdvancementType.TASK,
-            AdvancementType.GOAL,
-            AdvancementType.CHALLENGE
-        );
-        searchResults.sort((prevNode, nextNode) -> {
-            DisplayInfo display = prevNode.advancement().display().orElse(null);
+        searchResults.sort((node, nextNode) -> {
+            DisplayInfo display = node.advancement().display().orElse(null);
             DisplayInfo nextDisplay = nextNode.advancement().display().orElse(null);
             if (display == null || nextDisplay == null) {
                 return 0;
             }
-            int frameIndex = frameOrder.indexOf(display.getType());
-            int nextFrameIndex = frameOrder.indexOf(nextDisplay.getType());
-            return Integer.compare(frameIndex, nextFrameIndex);
+            int typeIndex = TYPE_PRIORITY.indexOf(display.getType());
+            int nextTypeIndex = TYPE_PRIORITY.indexOf(nextDisplay.getType());
+            return Integer.compare(typeIndex, nextTypeIndex);
         });
+        showSearchResults();
     }
 
     @Unique
@@ -432,17 +372,8 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             widget.children.clear();
         }
         searchTab.widgets.clear();
-    }
-
-    @Unique
-    private void highlight(@NotNull AdvancementNode advancement, HighlightType type) {
-        if (highlightedAdvancement != null) {
-            return;
-        }
-        isSearchActive = false;
-        highlightedAdvancement = advancement;
-        highlightType = type;
-        advancements.setSelectedTab(advancement.root().holder(), true);
+        searchTab.hovered = null;
+        searchTab.fade = 0.0f;
     }
 
     @Shadow
@@ -452,46 +383,50 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
     @Shadow
     private @Nullable AdvancementTab selectedTab;
 
+    @Shadow
+    private int leftPos;
+
+    @Shadow
+    private int topPos;
+
     @Inject(
         method = "extractInside",
         at = @At("TAIL")
     )
-    private void startHighlight(GuiGraphicsExtractor graphics, int xo, int yo, CallbackInfo ci) {
-        if (highlightedAdvancement == null || selectedTab == null) {
+    private void startFlashing(GuiGraphicsExtractor graphics, CallbackInfo ci) {
+        if (flashingAdvancementId == null || flashingTickCounter != 0 || selectedTab == null) {
             return;
         }
         for (AdvancementWidget widget : selectedTab.widgets.values()) {
-            if (widget.advancementNode == highlightedAdvancement) {
-                int centerX = (WIDGET_SIZE - advancementssearch$getTreeWidth()) / 2;
-                int centerY = (WIDGET_SIZE - advancementssearch$getTreeHeight()) / 2;
+            if (widget.advancementNode.holder().id().equals(flashingAdvancementId)) {
+                int centerX = (WIDGET_SIZE - advancements_search$getTreeWidth()) / 2;
+                int centerY = (WIDGET_SIZE - advancements_search$getTreeHeight()) / 2;
                 selectedTab.scroll(
                     -(selectedTab.scrollX + widget.getX() + TREE_X_OFFSET + centerX),
                     -(selectedTab.scrollY + widget.getY() + centerY)
                 );
-                highlightedAdvancement = null;
-                highlightedAdvancementId = widget.advancementNode.holder().id();
-                widgetHighlightCounter = WIDGET_HIGHLIGHT_COUNT * 2 * WIDGET_HIGHLIGHT_TICKS;
+                flashingTickCounter = FLASHING_COUNT * 2 * FLASHING_TICKS_INTERVAL;
                 break;
             }
         }
     }
 
-    @Redirect(
+    @WrapOperation(
         method = "mouseClicked",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/ClientAdvancements;setSelectedTab(Lnet/minecraft/advancements/AdvancementHolder;Z)V"
         )
     )
-    private void mouseClickedRedirect(
-        ClientAdvancements clientAdvancements, AdvancementHolder selectedTab, boolean tellServer
+    private void closeSearchOnTabChange(
+        ClientAdvancements instance, AdvancementHolder selectedTab, boolean tellServer, Operation<Void> original
     ) {
         isSearchActive = false;
-        advancementssearch$stopHighlight();
-        clientAdvancements.setSelectedTab(selectedTab, true);
+        advancements_search$stopFlashing();
+        original.call(instance, selectedTab, tellServer);
     }
 
-    @Redirect(
+    @ModifyExpressionValue(
         method = "extractInside",
         at = @At(
             value = "FIELD",
@@ -499,32 +434,45 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             opcode = Opcodes.GETFIELD
         )
     )
-    private @Nullable AdvancementTab drawAdvancementTreeInject(AdvancementsScreen screen) {
-        return !isSearchActive ? selectedTab : searchTab.widgets.size() > 1 ? searchTab : null;
+    private @Nullable AdvancementTab redirectTabToExtract(AdvancementTab original) {
+        if (isSearchActive) {
+            return searchTab.widgets.size() > 1 ? searchTab : null;
+        }
+        return original;
     }
 
-    @ModifyArgs(
+    @ModifyExpressionValue(
+        method = "tick",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;selectedTab:Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;",
+            opcode = Opcodes.GETFIELD
+        )
+    )
+    private AdvancementTab redirectTickToSearchTab(AdvancementTab original) {
+        return isSearchActive ? searchTab : selectedTab;
+    }
+
+    @WrapOperation(
         method = "extractWindow",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;extractTab(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIIZ)V"
         )
     )
-    private void drawWindowModifyTabSelected(Args args) {
-        if (isSearchActive) {
-            args.set(5, false);
-        }
+    private void resetTabSelection(AdvancementTab instance, GuiGraphicsExtractor graphics, int xo, int yo, int mouseX, int mouseY, boolean selected, Operation<Void> original) {
+        original.call(instance, graphics, xo, yo, mouseX, mouseY, !isSearchActive && selected);
     }
 
-    @Redirect(
+    @WrapOperation(
         method = "extractWindow",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
         )
     )
-    private void modifyWindowTitleRender(
-        GuiGraphicsExtractor graphics, Font font, Component str, int x, int y, int color, boolean dropShadow
+    private void enableMarqueeTitleOnOverflow(
+        GuiGraphicsExtractor graphics, Font font, Component str, int x, int y, int color, boolean dropShadow, Operation<Void> original
     ) {
         if (isSearchActive) {
             str = SEARCH_TITLE;
@@ -542,10 +490,10 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             double pos = Mth.lerp(alpha, 0, excessWidth);
 
             graphics.enableScissor(x, y, rightEdgeX, bottomY);
-            graphics.text(font, str, x - (int) pos, y, color, dropShadow);
+            original.call(graphics, font, str, x - (int) pos, y, color, dropShadow);
             graphics.disableScissor();
         } else {
-            graphics.text(font, str, x, y, color, dropShadow);
+            original.call(graphics, font, str, x, y, color, dropShadow);
         }
     }
 
@@ -553,21 +501,16 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         method = "extractTooltips",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;extractTooltips(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIII)V"
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;extractTooltips(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"
         )
     )
     private AdvancementTab drawWidgetTooltipRedirectTab(
-        AdvancementTab original,
-        GuiGraphicsExtractor graphics,
-        int mouseX,
-        int mouseY,
-        int x,
-        int y
+        AdvancementTab original, GuiGraphicsExtractor graphics, int xo, int yo
     ) {
         return isSearchActive ? searchTab : original;
     }
 
-    @Redirect(
+    @ModifyExpressionValue(
         method = "mouseScrolled",
         at = @At(
             value = "FIELD",
@@ -575,11 +518,11 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             opcode = Opcodes.GETFIELD
         )
     )
-    private AdvancementTab mouseScrolledRedirect(AdvancementsScreen screen) {
-        return isSearchActive ? searchTab : selectedTab;
+    private AdvancementTab redirectScrollToSearchTab(AdvancementTab original) {
+        return isSearchActive ? searchTab : original;
     }
 
-    @Redirect(
+    @ModifyExpressionValue(
         method = "mouseDragged",
         at = @At(
             value = "FIELD",
@@ -587,15 +530,15 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             opcode = Opcodes.GETFIELD
         )
     )
-    private AdvancementTab mouseDraggedRedirect(AdvancementsScreen screen) {
-        return isSearchActive ? searchTab : selectedTab;
+    private AdvancementTab redirectDragToSearchTab(AdvancementTab original) {
+        return isSearchActive ? searchTab : original;
     }
 
     @Inject(
         method = "init",
         at = @At(value = "TAIL")
     )
-    public void initInject(CallbackInfo ci) {
+    public void initSearchGui(CallbackInfo ci) {
         searchBox = new EditBox(
             font,
             0,
@@ -647,32 +590,26 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         method = "extractRenderState",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractInside(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractInside(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
         )
     )
     public void getWindowSizes(
-        AdvancementsScreen screen,
-        GuiGraphicsExtractor context,
-        int x,
-        int y,
-        Operation<Void> original
+        AdvancementsScreen instance, GuiGraphicsExtractor graphics, Operation<Void> original
     ) {
-        windowX = x;
-        windowY = y;
-        treeWidth = Math.abs(windowX * 2 - width) - WINDOW_BORDER_SIZE - WINDOW_BORDER_SIZE;
-        treeHeight = Math.abs(windowY * 2 - height) - WINDOW_HEADER_HEIGHT - WINDOW_BORDER_SIZE;
-        original.call(screen, context, x, y);
+        treeWidth = Math.abs(leftPos * 2 - width) - WINDOW_BORDER_SIZE - WINDOW_BORDER_SIZE;
+        treeHeight = Math.abs(topPos * 2 - height) - WINDOW_HEADER_HEIGHT - WINDOW_BORDER_SIZE;
+        original.call(instance, graphics);
     }
 
     @Inject(
         method = "extractRenderState",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIII)V",
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V",
             shift = At.Shift.AFTER
         )
     )
-    public void renderInject(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void renderInject(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (searchBox == null) {
             return;
         }
@@ -691,25 +628,21 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         }
 
         int symmetryFixX = 1;
-        int fieldX = windowX + treeWidth + WINDOW_BORDER_SIZE - SEARCH_FIELD_WIDTH + symmetryFixX;
-        int fieldY = windowY + 4;
+        int fieldX = leftPos + treeWidth + WINDOW_BORDER_SIZE - SEARCH_FIELD_WIDTH + symmetryFixX;
+        int fieldY = topPos + 4;
 
         graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             CREATIVE_INVENTORY_TEXTURE,
-            fieldX,
-            fieldY,
-            SEARCH_FIELD_UV.x,
-            SEARCH_FIELD_UV.y,
-            SEARCH_FIELD_WIDTH,
-            SEARCH_FIELD_HEIGHT,
-            256,
-            256
+            fieldX, fieldY,
+            SEARCH_FIELD_UV.x, SEARCH_FIELD_UV.y,
+            SEARCH_FIELD_WIDTH, SEARCH_FIELD_HEIGHT,
+            256, 256
         );
 
         searchBox.setX(fieldX + SEARCH_FIELD_TEXT_LEFT_OFFSET);
         searchBox.setY(fieldY + SEARCH_FIELD_TEXT_LEFT_OFFSET);
-        searchBox.extractRenderState(graphics, mouseX, mouseY, delta);
+        searchBox.extractRenderState(graphics, mouseX, mouseY, a);
     }
 
     @Inject(
@@ -722,7 +655,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
             String oldText = searchBox.getValue();
             if (searchBox.keyPressed(event)) {
                 if (!Objects.equals(oldText, searchBox.getValue())) {
-                    searchByUser();
+                    processSearch();
                 }
                 cir.setReturnValue(true);
             }
@@ -741,6 +674,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         if (searchBox != null && searchBox.mouseClicked(event, doubleClick)) {
             isSearchActive = !searchBox.getValue().isEmpty();
             cir.setReturnValue(true);
+            return;
         }
         isFocusedAdvancementClicked = focusedAdvancementWidget != null &&
             focusedAdvancementWidget.tab == searchTab &&
@@ -752,11 +686,7 @@ public abstract class AdvancementsScreenMixin extends Screen implements Advancem
         at = @At(value = "HEAD")
     )
     private void resetFocusedAdvancementOnScroll(
-        double mouseX,
-        double mouseY,
-        double horizontalAmount,
-        double verticalAmount,
-        CallbackInfoReturnable<Boolean> cir
+        double x, double y, double scrollX, double scrollY, CallbackInfoReturnable<Boolean> cir
     ) {
         isFocusedAdvancementClicked = false;
     }
